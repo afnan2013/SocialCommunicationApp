@@ -6,9 +6,10 @@ import { Component } from "@angular/core";
 })
 export class PostCreateComponent {
 
+  postInput = "";
   newPost = "NO CONTENT";
 
-  addPost(postInput: HTMLInputElement){
-    this.newPost = postInput.value;
+  addPost(){
+    this.newPost = this.postInput;
   }
 }

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Post } from './post/post.model';
 
 @Component({
   selector: 'app-root',
@@ -8,10 +7,4 @@ import { Post } from './post/post.model';
 })
 export class AppComponent {
   title = 'SocialApp';
-
-  postList: Post[]= [];
-
-  onPostAdded(newPost : Post){
-    this.postList.push(newPost);
-  }
 }

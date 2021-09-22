@@ -30,14 +30,15 @@ app.post("/api/posts", (req, res, next)=>{
     title: req.body.title,
     content: req.body.content
   });
-  post.save().then(()=>{
-    //console.log(post);
+  post.save().then(createdPost=>{
+    //console.log(createdPost);
     res.status(201).json({
-      message: "Post added Successfully!"
-    }).catch((err)=>{
-      console.log("Post Addition Failed! \n"+err);
+      message: "Post added Successfully!",
+      postId: createdPost._id
     });
-  });
+  }).catch((err)=>{
+    console.log("Post Addition Failed! \n"+err);
+  });;
 
 });
 
@@ -55,6 +56,14 @@ app.get("/api/posts", (req, res, next)=>{
     console.log(err);
   });
 
+});
+
+app.delete("/api/posts/:id", (req, res, next)=>{
+  Post.deleteOne({_id: req.params.id})
+    .then(result=>{
+      console.log(result);
+      res.status(200).json({ message: "Post Deleted!"});
+    }).catch(err=>{console.log(err);});
 });
 
 module.exports = app;

@@ -1,7 +1,16 @@
 const express = require('express');
+const mongoose = require('mongoose');
+
+const Post = require('./models/post');
 
 const app = express();
 
+mongoose.connect('mongodb+srv://phoenix01:sadia1472@meancluster.ntj96.mongodb.net/node-angular?retryWrites=true&w=majority')
+  .then(()=> {
+    console.log('MongoDB Connected');
+  }).catch((err)=>{
+    console.log('Connection Failed to MongoDB! \n'+err);
+  });
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
@@ -17,31 +26,35 @@ app.use((req, res, next)=>{
 
 // Addition od A post
 app.post("/api/posts", (req, res, next)=>{
-  const post = req.body;
-  console.log(post);
-  res.status(201).json({
-    message: "Post added Successfully!"
+  const post = new Post({
+    title: req.body.title,
+    content: req.body.content
   });
+  post.save().then(()=>{
+    //console.log(post);
+    res.status(201).json({
+      message: "Post added Successfully!"
+    }).catch((err)=>{
+      console.log("Post Addition Failed! \n"+err);
+    });
+  });
+
 });
 
 // Get All Posts
 app.get("/api/posts", (req, res, next)=>{
-  const posts = [
-    {
-      id:"sjhavshs",
-      title: "First Post From Server",
-      content: "This is the first post"
-    },
-    {
-      id:"sasasasas",
-      title: "Second Post From Server",
-      content: "This is the Second post"
-    },
-  ];
-  res.status(200).json({
-    message : "Posts Fetched Successfully",
-    posts : posts
+  Post.find().then(
+    (documents)=>{
+      //console.log(documents);
+      res.status(200).json({
+        message : "Posts Fetched Successfully",
+        posts : documents
+      });
+    }
+  ).catch((err)=>{
+    console.log(err);
   });
+
 });
 
 module.exports = app;

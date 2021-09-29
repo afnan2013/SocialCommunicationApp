@@ -17,7 +17,7 @@ export class PostCreateComponent implements OnInit{
   private postId: string;
   post: Post;
   isLoading = false;
-  imageUrl: string  ;
+  imageUrl: string;
 
   constructor(public postsService: PostsService, private route: ActivatedRoute){};
 
@@ -40,13 +40,13 @@ export class PostCreateComponent implements OnInit{
           this.post = {
             id: responseData.post.id,
             title: responseData.post.title,
-            content: responseData.post.content
+            content: responseData.post.content,
+            imagePath: responseData.post.imagePath
           };
-
           this.form.setValue({
             title: this.post.title,
             content: this.post.content,
-            image: null
+            image: this.post.imagePath
           });
         });
       }else{
@@ -57,7 +57,9 @@ export class PostCreateComponent implements OnInit{
   }
 
   onImagePicked(event: Event){
+    // console.log("Image Pick Event is triggered")
     const file = (event.target as HTMLInputElement).files[0];
+    // console.log(file);
     this.form.patchValue({image: file});
     this.form.get('image').updateValueAndValidity();
     const reader = new FileReader();
@@ -77,14 +79,15 @@ export class PostCreateComponent implements OnInit{
         id: null,
         title: this.form.value.title,
         content: this.form.value.content,
-
+        imagePath: null
       }
-      this.postsService.addPost(post);
+      this.postsService.addPost(post, this.form.value.image);
     }else{
       const post: Post = {
         id: this.postId,
         title: this.form.value.title,
-        content: this.form.value.content
+        content: this.form.value.content,
+        imagePath: this.form.value.image // this is a bug, here we can assign a file to our Post, but it shouldn't add a file as schema says it's a string
       }
       this.postsService.updatePost(post);
     }

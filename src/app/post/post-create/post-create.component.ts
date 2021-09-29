@@ -1,9 +1,10 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
-import { title } from "process";
+import { stringify } from "querystring";
 import { Post } from "../post.model";
 import { PostsService } from "../posts.service";
+import { mimeTypeValidator } from "./mime-type.validator";
 
 @Component({
   selector:"app-post-create",
@@ -16,15 +17,18 @@ export class PostCreateComponent implements OnInit{
   private postId: string;
   post: Post;
   isLoading = false;
+  imageUrl: string  ;
 
   constructor(public postsService: PostsService, private route: ActivatedRoute){};
 
   ngOnInit(){
     this.form = new FormGroup({
       title: new FormControl(null, {validators: [Validators.required, Validators.minLength(5)]}),
-      content: new FormControl(null, {validators: [Validators.required]})
+      content: new FormControl(null, {validators: [Validators.required]}),
+      image: new FormControl(null, {validators: [Validators.required], asyncValidators: [mimeTypeValidator]})
     });
 
+    // Only work for Edit
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('postId')) {
         this.mode = "edit";
@@ -41,7 +45,8 @@ export class PostCreateComponent implements OnInit{
 
           this.form.setValue({
             title: this.post.title,
-            content: this.post.content
+            content: this.post.content,
+            image: null
           });
         });
       }else{
@@ -49,6 +54,17 @@ export class PostCreateComponent implements OnInit{
         this.postId = null;
       }
     });
+  }
+
+  onImagePicked(event: Event){
+    const file = (event.target as HTMLInputElement).files[0];
+    this.form.patchValue({image: file});
+    this.form.get('image').updateValueAndValidity();
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imageUrl = reader.result as string;
+    }
+    reader.readAsDataURL(file);
   }
 
   onSavePost(){
@@ -60,7 +76,8 @@ export class PostCreateComponent implements OnInit{
       const post: Post = {
         id: null,
         title: this.form.value.title,
-        content: this.form.value.content
+        content: this.form.value.content,
+
       }
       this.postsService.addPost(post);
     }else{

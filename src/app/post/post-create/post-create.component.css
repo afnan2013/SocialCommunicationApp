@@ -15,3 +15,20 @@ mat-spinner {
 input[type="file"] {
   visibility: hidden;
 }
+
+.pick-image {
+  margin: 10px 0px;
+}
+
+.image-preview {
+  height: 10rem;
+  margin: 1rem 0;
+}
+
+.image-preview img {
+  height: 100%;
+}
+
+.error-image{
+  margin: 5px 5px 10px;
+}

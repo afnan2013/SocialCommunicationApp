@@ -7,6 +7,7 @@ import {map} from "rxjs/operators";
 import { Router } from "@angular/router";
 
 
+
 @Injectable({providedIn: "root"})
 export class PostsService {
   private posts: Post[] = [];
@@ -14,11 +15,13 @@ export class PostsService {
 
   constructor (private http: HttpClient, private router : Router){}
 
-  getPosts(){
-    this.http.get<{message: string, posts: any}>('http://localhost:3000/api/posts')
+  getPosts(postsPerPage: number, currentPage: number){
+    const querystring = `?pagesize=${postsPerPage}&pageindex=${currentPage}`;
+    this.http.get<{message: string, posts: any}>('http://localhost:3000/api/posts'+querystring)
     .pipe(map((postData)=>{
       return postData.posts.map((post)=>{
         return {
+          imagePath: post.imagePath,
           title: post.title,
           content: post.content,
           id: post._id
@@ -26,7 +29,8 @@ export class PostsService {
       });
     }))
     .subscribe((transformedPosts)=>{
-      console.log("Posts Get Successful");
+      // console.log("Posts Get Successful\n");
+      // console.log(transformedPosts)
       this.posts = transformedPosts;
       this.postsUpdated.next([...this.posts]);
     });
@@ -40,10 +44,16 @@ export class PostsService {
     return this.http.get<{message: string, post: Post}>('http://localhost:3000/api/posts/'+id);
   }
 
-  addPost(post : Post){
-    this.http.post<{message: string, postId:string}>('http://localhost:3000/api/posts', post).subscribe((responseData)=>{
-      //console.log(responseData.postId);
-      post.id = responseData.postId;
+  addPost(post : Post, image: File){
+    const postData = new FormData();
+    postData.append("title", post.title);
+    postData.append("content", post.content);
+    postData.append("image", image, post.title);  // second argument is the file name
+
+    this.http.post<{message: string, post: Post}>('http://localhost:3000/api/posts', postData).subscribe((responseData)=>{
+      // console.log(responseData.post);
+      post.id = responseData.post.id;
+      post.imagePath = responseData.post.imagePath;
       this.posts.push(post);
       this.postsUpdated.next([...this.posts]);
       this.router.navigate(["/"]);
@@ -59,11 +69,25 @@ export class PostsService {
   }
 
   updatePost(post : Post){
-    this.http.put<{message: string}>("http://localhost:3000/api/posts/"+post.id, post).subscribe(response => {
+    // console.log(post);
+    let postData : Post | FormData;
+    if (typeof(post.imagePath) === "string"){
+      //console.log("Image Untouched");
+      postData = post;
+    }else {
+      // console.log("Image is changed");
+      postData = new FormData();
+      postData.append("title", post.title);
+      postData.append("content", post.content);
+      postData.append("image", post.imagePath, post.title);
+
+    }
+    this.http.put<{message: string, updatedPost: Post}>("http://localhost:3000/api/posts/"+post.id, postData).subscribe(response => {
       console.log(response.message);
+      console.log(response.updatedPost);
       const updatedPost = [...this.posts];
       const oldPostIndex = updatedPost.findIndex(p => p.id === post.id);
-      updatedPost[oldPostIndex] = post;
+      updatedPost[oldPostIndex] = response.updatedPost;
       this.posts = updatedPost;
       this.postsUpdated.next([...this.posts]);
       this.router.navigate(["/"]);

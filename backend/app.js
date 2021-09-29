@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 
@@ -12,6 +13,10 @@ mongoose.connect('mongodb+srv://phoenix01:sadia1472@meancluster.ntj96.mongodb.ne
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+
+// Every File in a server in unaccessible from outside,first we need to declare that folder to statically access
+app.use("/images", express.static(path.join("backend/images")));
+
 
 // For CORS (Cross Origin Resource Sharing), As we have hosted our node server and Angular on different servers or domains
 // that's why we have to allow this headers so that browser wont block this response, ex: Cross-Site Request Forgery (CSRF) security issue

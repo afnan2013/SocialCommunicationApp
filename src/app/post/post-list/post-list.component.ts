@@ -11,9 +11,10 @@ import { PageEvent } from "@angular/material/paginator";
 })
 export class PostListComponent implements OnInit, OnDestroy{
   posts: Post[] = [];
-  totalPosts: number = 5;
+  totalPosts: number = 0;
+  // We can make this page properties dynamic from the user
   currentPage: number = 1;
-  postsPerPage: number = 2;
+  postsPerPage: number = 5;
   postsPerPageOptions: number[] = [1,2,3,4,5];
   private postsSubscription: Subscription;
   isLoading = false;
@@ -24,9 +25,10 @@ export class PostListComponent implements OnInit, OnDestroy{
     this.isLoading = true;
     this.postsService.getPosts(this.postsPerPage, this.currentPage);
     this.postsSubscription = this.postsService.getPostsUpdateListener().subscribe(
-      (posts: Post[])=>{
-        this.posts = posts;
+      (postData:{ posts: Post[],maxPostCount: number})=>{
         this.isLoading = false;
+        this.posts = postData.posts;
+        this.totalPosts = postData.maxPostCount;
       }
     );
   }
@@ -36,11 +38,14 @@ export class PostListComponent implements OnInit, OnDestroy{
   }
 
   onDelete(postId : string){
-    this.postsService.deletePost(postId);
+    this.isLoading = true;
+    this.postsService.deletePost(postId).subscribe((response)=>{
+      this.postsService.getPosts(this.postsPerPage, this.currentPage)
+    });;
   }
 
   onChangedPage(pageData : PageEvent){
-    console.log(pageData);
+    // console.log(pageData);
     this.isLoading = true;
     this.currentPage = pageData.pageIndex + 1;
     this.postsPerPage = pageData.pageSize;

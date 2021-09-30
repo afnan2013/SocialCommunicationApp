@@ -56,7 +56,7 @@ router.post("", multer({storage: storage}).single("image"),(req, res, next)=>{
 router.get("", (req, res, next)=>{
   const currentPage = +req.query.pageindex; // + is to make these variales integer as they are strings from the queryString
   const pageSize = +req.query.pagesize;
-
+  let queryPosts;
   const postQuery = Post.find();
   if (currentPage && pageSize){
     postQuery.skip(pageSize * (currentPage-1))
@@ -64,13 +64,17 @@ router.get("", (req, res, next)=>{
   }
   postQuery.then(
     (documents)=>{
-      //console.log(documents);
-      res.status(200).json({
-        message : "Posts Fetched Successfully",
-        posts : documents
-      });
+      queryPosts = documents;
+      return Post.count();
     }
-  ).catch((err)=>{
+  ).then(count=>{
+    //console.log(documents);
+    res.status(200).json({
+      message : "Posts Fetched Successfully",
+      posts : queryPosts,
+      maxCount : count
+    });
+  }).catch((err)=>{
     console.log(err);
   });
 

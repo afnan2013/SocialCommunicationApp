@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+// mongosh "mongodb+srv://meancluster.ntj96.mongodb.net/node-angular" --username phoenix01
 mongoose.connect('mongodb+srv://phoenix01:sadia1472@meancluster.ntj96.mongodb.net/node-angular?retryWrites=true&w=majority')
   .then(()=> {
     console.log('MongoDB Connected');
@@ -29,5 +30,6 @@ app.use((req, res, next)=>{
 
 // Adding All Posts Routes
 app.use("/api/posts", require('./routes/posts') );
+app.use("/api/users", require('./routes/users') );
 
 module.exports = app;

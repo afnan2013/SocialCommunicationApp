@@ -9,7 +9,7 @@
 
     <mat-form-field>
       <!-- <mat-label>Write Post *</mat-label> -->
-      <input matInput placeholder="Password" name="password" ngModel #inputPassword="ngModel" required>
+      <input matInput type="password" placeholder="Password" name="password" ngModel #inputPassword="ngModel" required>
       <mat-error *ngIf="inputPassword.invalid">Please enter your valid Password</mat-error>
     </mat-form-field>
 

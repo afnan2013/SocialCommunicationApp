@@ -23,7 +23,7 @@ app.use("/images", express.static(path.join("backend/images")));
 // that's why we have to allow this headers so that browser wont block this response, ex: Cross-Site Request Forgery (CSRF) security issue
 app.use((req, res, next)=>{
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
   next();
 });

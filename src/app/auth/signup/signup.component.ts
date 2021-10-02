@@ -14,7 +14,7 @@ export class SignupComponent {
   constructor(public authService: AuthService){}
 
   onSignup(form: NgForm){
-    // this.isLoading = true;
+    this.isLoading = true;
     // console.log(form.value);
     if (form.invalid){
       return;

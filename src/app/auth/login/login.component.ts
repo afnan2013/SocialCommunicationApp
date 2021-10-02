@@ -15,6 +15,7 @@ export class LoginComponent {
   constructor (public authService:AuthService, public router: Router) {}
 
   onLogin(form: NgForm){
+    this.isLoading = true;
     // console.log(form.value);
     if (form.invalid){
       return;

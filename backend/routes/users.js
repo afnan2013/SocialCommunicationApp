@@ -21,7 +21,8 @@ router.post("/login", (req, res, next)=>{
       }
       const token = jwt.sign({email: user.email, id: user._id}, "secret_key_need_longer", {expiresIn: "1h"});
       res.status(200).json({
-        token: token
+        token: token,
+        expiresIn: 3600
       });
     });
   }).catch(err=>console.log(err));
@@ -42,7 +43,7 @@ router.post("/signup", (req, res, next)=>{
         });
       }).catch(err=>{
         console.log(err);
-        res.status().json({
+        res.status(400).json({
           message: "Email is already Registered!",
           authUser: user
         });
